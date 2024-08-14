@@ -14,19 +14,23 @@ llm = Ollama(model="mistral-openorca:7b", request_timeout=3600.0)
 tools = [stock_reader_func]
 agent = ReActAgent.from_tools(tools, llm=llm, verbose=False)
 
-def handle_conversation():
-    context = ""
-    print("Welcome to the AI Chatbot!")
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() == "exit":
-            break
-        result = agent.chat(user_input)
-        print("Bot: ", result)
-        context += f"\nUser: {user_input}\nAI: {result}"
 
-handle_conversation()
+def stream_data(text, delay:float=0.02):
+    for word in text.split():
+        yield word + " "
+        time.sleep(delay)
+
+def main():
+    prompt = st.chat_input("Ask me Anything")
+
+    if prompt:
+        with st.chat_message("user"):
+            st.write(prompt)
+        
+        with st.spinner("Thinking ..."):
+            result = agent.chat(prompt)
+            result_text = result.text if hasattr(result, 'text') else str(result)
+            st.write_stream(stream_data(result_text))
 
 if __name__ == "__main__":
-    # main()
-    handle_conversation()
+    main()
