@@ -1,0 +1,1 @@
+context = """Purpose: The primary role of this agent is to inform user about AAPL latest stock price"""
